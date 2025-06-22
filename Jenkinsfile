@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    CAMUNDA_VERSION = "12.0.2"
+    CAMUNDA_VERSION = "12.1.0"
     CUSTOM_PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
   }
 
@@ -23,7 +23,7 @@ pipeline {
           export PATH=$CUSTOM_PATH:$PATH
           helm install camunda camunda/camunda-platform \
             --version $CAMUNDA_VERSION \
-            --namespace camunda \
+            --namespace default \
             --create-namespace \
             -f values.yaml
         '''
@@ -39,15 +39,5 @@ pipeline {
       }
     }
 
-    stage('Port Forward Operate (Optional)') {
-      steps {
-        sh '''
-          export PATH=$CUSTOM_PATH:$PATH
-          kubectl port-forward svc/camunda-operate 8080:80 -n camunda &
-          sleep 30
-          curl http://localhost:8080 || true
-        '''
-      }
-    }
   }
 }
