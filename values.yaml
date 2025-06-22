@@ -1,0 +1,670 @@
+global:
+  # elasticsearch:
+  #   enabled: true
+  #   external: true
+  #   # auth:
+  #   #   username: "elastic"
+  #   #   password: "xZtkpCYWVcj2HhvDeLE5JdcI"
+  #   auth:
+  #     username: "elastic" # Specify the username directly if it’s not part of the secret.
+  #     existingSecret: "elasticsearch-password" # Reference the secret containing the password.
+  #     existingSecretKey: "password" # Specify the key for the password in the secret.
+  #   url:
+  #     protocol: "https"
+  #     host: "camunda-61b8b7.es.australia-southeast1.gcp.elastic-cloud.com"
+  #     port: 9243
+  multitenancy:
+    enabled: false
+  identity:
+    auth:
+      enabled: true
+      publicIssuerUrl: "https://local.distro.ultrawombat.com/auth/realms/camunda-platform"
+      operate:
+        redirectUrl: "https://local.distro.ultrawombat.com/operate"
+      tasklist:
+        redirectUrl: "https://local.distro.ultrawombat.com/tasklist"
+      optimize:
+        redirectUrl: "https://local.distro.ultrawombat.com/optimize"
+      console:
+        redirectUrl: "https://local.distro.ultrawombat.com/console"
+      webModeler:
+        redirectUrl: "https://local.distro.ultrawombat.com/web-modeler"
+      connectors:
+        redirectUrl: "https://local.distro.ultrawombat.com/connectors"
+  # image:
+  #   tag: latest
+
+  ingress:
+    enabled: true
+    className: ""
+    host: "local.distro.ultrawombat.com"
+    tls:
+      enabled: true
+      secretName: camunda-platform
+  
+
+
+connectors:
+  enabled: true
+  contextPath: "/connectors"
+  inbound:
+    mode: oauth
+  # image:
+  #   repository: camunda/connectors-bundle
+  #   tag: 8.5.3
+
+elasticsearch:
+  enabled: true
+  # Request a single node with a persistent volume
+  master:
+    replicaCount: 1
+    persistence:
+      size: 15Gi
+
+# elasticsearch:
+#   enabled: true
+#   # Request a single node with a persistent volume
+#   master:
+#     replicaCount: 1
+#     persistence:
+#       size: 15Gi
+#   # extraConfig:
+#   #   cluster:
+#   #     max_shards_per_node: 1500
+#   global:
+#    kibanaEnabled: true
+#   kibana:
+#     image:
+#       tag: 8.12.2
+#     ingress:
+#       tls: true
+#       ingress:
+#         enabled: true
+#         secrets:
+#           - name: camunda-platform
+#       ingressClassName: nginx
+#       enabled: true
+#       pathType: Prefix
+#       hostname: "local.distro.ultrawombat.com"
+#       annotations:
+#         ingress.kubernetes.io/rewrite-target: "/"
+#         nginx.ingress.kubernetes.io/ssl-redirect: "false"
+#     configuration:
+#       server:
+#         basePath: "/kibana"
+#         rewriteBasePath: true
+#     readinessProbe:
+#       enabled: false
+#   metrics:
+#     enabled: true
+#     # image:
+#     #   registry: docker.io
+#     #   repository: prometheuscommunity/elasticsearch-exporter
+#     #   tag: latest
+#     #   extraArgs:
+#     #     - --es.indices
+#     # security:
+#     #   enabled: false
+#     #   tls:
+#     #     restEncryption: false
+#     serviceMonitor:
+#       enabled: true
+#       labels:
+#         release: prometheus
+
+#     extraArgs:
+#       - --es.indices
+
+identity:
+  # env:
+  #   - name: RESOURCE_PERMISSIONS_ENABLED
+  #     value: "true"
+  enabled: true
+  contextPath: "/identity"
+  fullURL: "https://local.distro.ultrawombat.com/identity"
+
+  # externalDatabase:
+  #   enabled: true
+  # env:
+  #   # - name: LOGGING_LEVEL_ROOT
+  #   #   value: "DEBUG"
+  #   - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+  #     value: software.amazon.jdbc.Driver
+  #   - name: SPRING_DATASOURCE_URL
+  #     value: jdbc:aws-wrapper:postgresql://ksoptusalb-postgresql.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/ks1?wrapperPlugins=iam
+  #     # &ssl=true&sslrootcert=/home/runner/.postgresql/ap-southeast-2-bundle.pem
+  #   - name: SPRING_DATASOURCE_USERNAME
+  #     value: kaviya 
+  # serviceAccount:
+  #   enabled: true
+  #   name: "camunda-identity-postgres"
+  #   annotations:
+  #     eks.amazonaws.com/role-arn: "arn:aws:iam::655394773887:role/aurora-camunda-identity-postgres"    
+
+# identityPostgresql:
+#   enabled: false
+  # image:
+  #   repository: camunda/identity
+  #   tag: 8.5.2
+
+operate:
+  # env:
+  #   - name: CAMUNDA_OPERATE_IDENTITY_RESOURCEPERMISSIONSENABLED
+  #     value: "true"
+  # resources:
+  #   limits:
+  #     cpu: 1
+  #     memory: 1Gi
+  #   requests:
+  #     cpu: 0.3
+  #     memory: 200Mi
+  enabled: true
+  contextPath: "/operate"
+  # image:
+  #   repository: camunda/operate
+  #   tag: 8.5.3
+
+
+# operate:
+#   enabled: true
+#   contextPath: "/operate"
+#   retention:
+#     enabled: true
+#     minimumAge: 1m
+#   env:
+# # Archive https://docs.camunda.io/docs/self-managed/operate-deployment/importer-and-archiver/#archive-period 
+#   # - name: CAMUNDA_OPERATE_ARCHIVER_WAITPERIODBEFOREARCHIVING
+#   #   value: 5s  
+#     - name: CAMUNDA_OPERATE_IDENTITY_RESOURCEPERMISSIONSENABLED
+#       value: "true"
+
+
+optimize:
+  enabled: false
+  contextPath: "/optimize"
+  # env:
+  #   - name: CAMUNDA_OPTIMIZE_ZEEBE_INCLUDE_OBJECT_VARIABLE
+  #     value: "false"
+
+
+
+tasklist:
+  # env:
+  #   - name: CAMUNDA_TASKLIST_IDENTITY_RESOURCE_PERMISSIONS_ENABLED
+  #     value: "true"
+  enabled: true
+  contextPath: "/tasklist"
+  # image:
+  #   repository: camunda/tasklist
+  #   tag: 8.5.2
+
+
+# tasklist:
+#   enabled: true
+#   contextPath: "/tasklist"
+#   retention:
+#     enabled: true
+#     minimumAge: 1m
+#   env:
+# # Archive NOT Documented
+#   # - name: CAMUNDA_TASKLIST_ARCHIVER_WAITPERIODBEFOREARCHIVING
+#   #   value: 5s
+#     - name: CAMUNDA_TASKLIST_IDENTITY_RESOURCE_PERMISSIONS_ENABLED
+#       value: "true"
+
+# Reduce for Zeebe and Gateway the configured replicas and with that the required resources
+# to get it running locally
+zeebe:
+  clusterSize: 1
+  partitionCount: 1
+  replicationFactor: 1
+  pvcSize: 10Gi
+  # env:
+  env:
+    - name: ZEEBE_BROKER_EXECUTION_METRICS_EXPORTER_ENABLED
+      value: "true"
+  #   - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_CLASSNAME
+  #     value: "io.zeebe.exporters.kafka.KafkaExporter"
+  #   - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_JARPATH
+  #     value: "/usr/local/zeebe/exporters/zeebe-kafka-exporter.jar"
+  #   - name: KAFKA_BOOTSTRAP_SERVERS
+  #     value: "kafka-broker-0.kafka-broker-headless.default.svc.cluster.local:9092,kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9092"
+  #   - name: LOGGING_LEVEL_IO_CAMUNDA_ZEEBE
+  #     value: "DEBUG"
+
+  # extraInitContainers:
+  # - name: init-exporters-kafka
+  #   image: appropriate/curl  
+  #   command: ["/bin/sh", "-c"]  
+  #   args:
+  #     [
+  #       "curl -L -o /exporters/zeebe-kafka-exporter.zip https://github.com/camunda-community-hub/zeebe-kafka-exporter/releases/download/3.1.1/zeebe-kafka-exporter-3.1.1.zip && unzip -o /exporters/zeebe-kafka-exporter.zip -d /exporters/ && mv /exporters/target/nexus-staging/staging/771b23290bd13e/io/zeebe/zeebe-kafka-exporter/3.1.1/zeebe-kafka-exporter-3.1.1-jar-with-dependencies.jar /exporters/zeebe-kafka-exporter.jar && chmod 644 /exporters/zeebe-kafka-exporter.jar"
+  #     ]
+  #   volumeMounts:
+  #     - name: exporters-zeebe  
+  #       mountPath: /exporters/  
+  #   securityContext:
+  #     runAsUser: 1000  # Non-root user to match Zeebe's security settings
+
+  # extraVolumes:
+  #   - name: exporters-zeebe
+  #     emptyDir: {}
+
+  # extraVolumeMounts:
+  #   - name: exporters-zeebe
+  #     mountPath: /usr/local/zeebe/exporters  
+
+
+# zeebe:
+#   clusterSize: 1
+#   partitionCount: 1
+#   replicationFactor: 1
+#   pvcSize: 10Gi
+#   env:
+#     - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_CLASSNAME
+#       value: "io.zeebe.exporters.kafka.KafkaExporter"
+#     - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_JARPATH
+#       value: "/usr/local/zeebe/exporters/zeebe-kafka-exporter.jar"
+#     - name: KAFKA_BOOTSTRAP_SERVERS
+#       value: "kafka-broker-0.kafka-broker-headless.default.svc.cluster.local:9092,kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9092"
+#     # - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+#     #   value: /usr/local/zeebe/lib/zeebe-kafka-exporter.yml  # Environment variable to load the config
+#     - name: LOGGING_LEVEL_IO_CAMUNDA_ZEEBE
+#       value: "DEBUG"
+#   extraInitContainers:
+#   - name: init-exporters-kafka
+#     image: appropriate/curl  # Use the appropriate/curl image
+#     # args:
+#     #   - "-o"
+#     #   - "/exporters/zeebe-kafka-exporter.jar"  # Path where the JAR will be saved
+#     #   - "https://github.com/zeebe-io/zeebe-kafka-exporter/releases/download/1.1.0/zeebe-kafka-exporter-1.1.0-uber.jar"  # URL to download the JAR
+#     command: ["/bin/sh", "-c"]  # Use shell for running both curl and chmod
+#     args:
+#       [
+#         # "curl -L -o /exporters/zeebe-kafka-exporter.jar https://github.com/zeebe-io/zeebe-kafka-exporter/releases/download/1.1.0/zeebe-kafka-exporter-1.1.0-uber.jar && chmod 644 /exporters/zeebe-kafka-exporter.jar"
+#         "curl -L -o /exporters/zeebe-kafka-exporter.zip https://github.com/camunda-community-hub/zeebe-kafka-exporter/releases/download/3.1.1/zeebe-kafka-exporter-3.1.1.zip && unzip -o /exporters/zeebe-kafka-exporter.zip -d /exporters/ && mv /exporters/target/nexus-staging/staging/771b23290bd13e/io/zeebe/zeebe-kafka-exporter/3.1.1/zeebe-kafka-exporter-3.1.1-jar-with-dependencies.jar /exporters/zeebe-kafka-exporter.jar && chmod 644 /exporters/zeebe-kafka-exporter.jar"
+#       ]
+#     volumeMounts:
+#       - name: exporters-zeebe  # Mount the volume where the JAR will be saved
+#         mountPath: /exporters/  # The path where the file will be saved
+#     securityContext:
+#       runAsUser: 1000  # Non-root user to match Zeebe's security settings
+
+#   extraVolumes:
+#     - name: exporters-zeebe
+#       emptyDir: {}
+
+#   extraVolumeMounts:
+#     - name: exporters-zeebe
+#       mountPath: /usr/local/zeebe/exporters  # This should match the init container's volume mount
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_PRODUCER_CONFIG
+    #   value: "linger.ms=5\nbuffer.memory=8388608\nbatch.size=32768\nmax.block.ms=5000"
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_RECORDS_DEFAULTS_TYPE
+    #   value: ""
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_RECORDS_DEFAULTS_TOPIC
+    #   value: "zeebe"
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_RECORDS_JOB_TYPE
+    #   value: "event"
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_RECORDS_JOB_TOPIC
+    #   value: "zeebe-job"
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_RECORDS_PROCESSINSTANCE_TYPE
+    #   value: "event"
+    # - name: ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_RECORDS_PROCESSINSTANCE_TOPIC
+    #   value: "zeebe-process-instance"
+
+
+  # extraInitContainers:
+  #   - name: init-exporters-kafka
+  #     image: alpine:latest
+  #     command: ["/bin/sh", "-c"]
+  #     args:
+  #       [
+  #         "apk add --no-cache curl && curl -L --fail https://github.com/zeebe-io/zeebe-kafka-exporter/releases/download/1.1.0/zeebe-kafka-exporter-1.1.0-uber.jar -o /exporters/zeebe-kafka-exporter.jar; chmod 644 /exporters/zeebe-kafka-exporter.jar; ls -al /exporters",
+  #       ]
+  #     volumeMounts:
+  #       - name: exporters-zeebe 
+  #         mountPath: /exporters/
+  #     securityContext:
+  #       runAsUser: 0             # Run as root
+  #       allowPrivilegeEscalation: true  # Allow escalation temporarily
+
+
+  # containerSecurityContext:
+  #   readOnlyRootFilesystem: false
+  # env:
+  #     - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_CLASSNAME
+  #       value: "io.zeebe.exporters.kafka.KafkaExporter"
+  #     - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_JARPATH
+  #       value: "/exporters/zeebe-kafka-exporter.jar"
+  #     - name: KAFKA_BOOTSTRAP_SERVERS
+  #       value: "localhost:9092"
+  #     - name: LOGGING_LEVEL_IO_CAMUNDA_ZEEBE
+  #       value: "INFO"
+
+  # extraVolumeMounts:
+  #   - name: exporters-volume
+  #     mountPath: /exporters  # Mount the PVC at /exporters where the JAR will be located
+
+  # extraVolumes:
+  #   - name: exporters-volume
+  #     persistentVolumeClaim:
+  #       claimName: exporters-pvc  # Link the PVC to the Zeebe container
+
+
+  # nodeSelector:
+  #   kubernetes.io/hostname: node-name
+  # pvcStorageClassName: camunda-stg-das
+  # retention:
+  #   enabled: true
+  #   minimumAge: 1m
+  #   policyName: zeebe-record-retention-policy
+
+  # affinity:
+  #   podAntiAffinity: null
+  # image:
+  #   repository: camunda/zeebe
+  #   tag: 8.5.3
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #             - key: kubernetes.io/hostname
+  #               operator: In
+  #               values:
+  #                 - camunda-local-control-plane
+
+  # env:
+  #     - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_CLASSNAME
+  #       value: "io.zeebe.exporters.kafka.KafkaExporter"
+  #     - name: ZEEBE_BROKER_EXPORTERS_KAFKAEXPORTER_JARPATH
+  #       value: "/usr/local/zeebe/exporters/zeebe-kafka-exporter.jar"
+  #     - name: KAFKA_BOOTSTRAP_SERVERS
+  #       value: "localhost:9092"
+
+  # extraInitContainers:
+  #   - name: init-exporters-kafka
+  #     image: busybox:1.35
+  #     command: ["/bin/sh", "-c"]
+  #     args:
+  #       [
+  #         "wget --no-check-certificate https://github.com/zeebe-io/zeebe-kafka-exporter/releases/download/1.1.0/zeebe-kafka-exporter-1.1.0-uber.jar -O /exporters/zeebe-kafka-exporter.jar; ls -al /exporters",
+  #       ]
+  #     volumeMounts:
+  #       - name: exporters
+  #         mountPath: /exporters/
+  #     securityContext:
+  #       runAsUser: 1000  # Non-root user
+  # extraVolumes:
+  #   - name: exporters-zeebe
+  #     emptyDir: {}
+  # extraVolumeMounts:
+  #   - name: exporters-zeebe
+  #     mountPath: /usr/local/zeebe/exporters
+
+# identityKeycloak:
+#   postgresql:
+#     enabled: false
+#   externalDatabase:
+#       host: host.docker.internal  
+#       port: 5432
+#       user: newuser  
+#       database: camunda8.6test
+#       password: test  
+#   extraEnvVars:
+#     - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
+#       value: "true"
+#     - name: KEYCLOAK_DATABASE_SCHEMA
+#       value: "keycloak"
+
+# identityKeycloak:
+#   postgresql:
+#     enabled: false
+#   # externalDatabase:
+#   #   host: your-postgres-host
+#   #   port: 5432
+#   #   user: your-database-user
+#   #   database: your-database-name
+#   #   password: your-database-password
+#   externalDatabase:
+#       host: host.docker.internal  # Or your actual PostgreSQL host if different
+#       port: 5432
+#       user: newuser  # Replace with your actual database user
+#       database: camunda8.6test
+#       password: test  # Replace with your actual database password
+   
+#   extraEnvVars:
+#     - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
+#       value: "true"
+#     # - name: KC_LOG_LEVEL
+#     #   value: DEBUG
+#     - name: KEYCLOAK_DATABASE_SCHEMA
+#       value: "keycloak"
+
+# zeebe-gateway:
+zeebeGateway:
+  # image:
+  #   repository: camunda/zeebe
+  #   tag: 8.5.3
+  env:
+    - name: ZEEBE_GATEWAY_MONITORING_ENABLED
+      value: "true" 
+    - name: CAMUNDA_REST_QUERY_ENABLED
+      value: "true" 
+  replicas: 1
+  # ingress:
+  #   enabled: true
+  #   className: "nginx"
+  #   host: "zeebe.local.distro.ultrawombat.com"
+  #   tls:
+  #     enabled: true
+  #     secretName: camunda-platform
+  ingress:
+    grpc:
+      enabled: true
+      className: ""
+      host: "zeebe.local.distro.ultrawombat.com"
+      tls:
+        enabled: true
+        secretName: camunda-platform
+    rest:
+      enabled: true
+      className: ""
+      host: "zeeberest.local.distro.ultrawombat.com"
+      tls:
+        enabled: true
+        secretName: camunda-platform
+  # affinity:
+  #   podAntiAffinity: null
+
+console:
+  image:
+    tag: 8.5.112
+    pullSecrets:
+    - name: registry-camunda-cloud
+  enabled: false
+  contextPath: "/console"
+  env: 
+  - name: CAMUNDA_CONSOLE_TELEMETRY
+    value: download
+  - name: CAMUNDA_CONSOLE_CUSTOMERID
+    value: kaviya.sridhar
+  - name: CAMUNDA_CONSOLE_INSTALLATIONID
+    value: local-camunda8-install
+
+
+
+
+# webModeler:
+#   # serviceAccount:
+#   #   enabled: true
+#   #   name: "camunda-platform-web-modeler"  # Fill in the name of the Service Account if required
+#   #   annotations:
+#   #     eks.amazonaws.com/role-arn: "arn:aws:iam::091704606480:role/aurora-role"
+#   enabled: true
+#   contextPath: "/modeler"
+#   image:
+#     pullSecrets:
+#     - name: registry-camunda-cloud
+#   restapi:
+#     mail:
+#       # This value is required, otherwise, the restapi pod won't start.
+#       fromAddress: noreply@example.com
+#   # externalDatabase:
+#   #    password: "postgres"
+#   #    url: "jdbc:aws-wrapper:postgresql://database-1.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/postgres"
+#   #    user: "postgres"
+#   # env:
+#   #    - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+#   #      value: software.amazon.jdbc.Driver
+#   #    - name: SPRING_DATASOURCE_PASSWORD
+#   #      value: ""
+
+
+# webModeler:
+#   contextPath: /web-modeler
+#   enabled: true
+#   image:
+#     pullSecrets:
+#       - name: registry-camunda-cloud
+#   restapi:
+#     mail:
+#       # This value is required, otherwise, the restapi pod won't start.
+#       fromAddress: noreply@example.com
+#     env:
+#     - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+#       value: software.amazon.jdbc.Driver
+#     - name: SPRING_DATASOURCE_URL
+#       value: jdbc:aws-wrapper:postgresql://ksoptusalb-postgresql.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/modeler?wrapperPlugins=iam&
+#     - name: SPRING_DATASOURCE_USERNAME
+#       value: kaviya
+#     - name: SPRING_DATASOURCE_PASSWORD
+#       value: notused      
+#     # - name: LOGGING_LEVEL_IO_GRPC
+#     #   value: DEBUG
+#     # - name: LOGGING_LEVEL_IO_CAMUNDA_MODELER
+#     #   value: DEBUG
+#     # - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+#     #   value: DEBUG
+#     # - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
+#     #   value: DEBUG
+#     # - name: LOGGING_LEVEL_IO_GRPC
+#     #   value: TRACE
+#     # - name: LOGGING_LEVEL_IO_CAMUNDA_MODELER
+#     #   value: DEBUG
+#     # - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+#     #   value: DEBUG
+#     # - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
+#     #   value: DEBUG
+#   serviceAccount:
+#     enabled: true
+#     name: "camunda-platform-web-modeler"  # Fill in the name of the Service Account if required
+#     annotations:
+#       eks.amazonaws.com/role-arn: "arn:aws:iam::655394773887:role/test-aurora-optus-role"
+
+
+# webModeler:
+#   contextPath: /web-modeler
+#   enabled: true
+#   image:
+#     pullSecrets:
+#       - name: registry-camunda-cloud
+#   restapi:
+#     mail:
+#       fromAddress: noreply@example.com
+#     env:
+#     - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+#       value: software.amazon.jdbc.Driver
+#     - name: SPRING_DATASOURCE_URL
+#       value: jdbc:aws-wrapper:postgresql://ksoptusalb-postgresql.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/modeler?wrapperPlugins=iam&ssl=true
+#     - name: SPRING_DATASOURCE_USERNAME
+#       value: kaviya
+#     - name: LOGGING_LEVEL_IO_GRPC
+#       value: TRACE
+#     - name: LOGGING_LEVEL_IO_CAMUNDA_MODELER
+#       value: DEBUG
+#     - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+#       value: DEBUG
+#     - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
+#       value: DEBUG
+#   serviceAccount:
+#     enabled: true
+#     name: "camunda-platform-web-modeler"
+#     annotations:
+#       eks.amazonaws.com/role-arn: "arn:aws:iam::655394773887:role/test-aurora-optus-role"
+#   extraVolumes:
+#     - name: postgres-root-cert
+#       configMap:
+#         name: postgres-root-cert
+#   extraVolumeMounts:
+#     - name: postgres-root-cert
+#       mountPath: /root/.postgresql
+#       subPath: root.crt
+
+webModeler:
+  contextPath: /web-modeler
+  enabled: true
+  image:
+    # registry: registry.camunda.cloud
+    # tag: 8.5.5
+    pullSecrets:
+      - name: registry-camunda-cloud
+  # webapp:
+  #   env:
+  #   - name: MARKETPLACE_API_BASE_URL
+  #     value: "http://10.110.157.26:3128/api/v1"
+  
+  restapi:
+    mail:
+      fromAddress: kaviya.sridhar@camunda.com
+    # mail:  
+    #   smtpHost: "kaviya.au"
+    #   smtpPort: 25
+    #   smtpTlsEnabled: false
+    #   fromAddress: test@kaviya.au
+    #   fromName: "Camunda Test"
+    env:
+#     - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+#       value: software.amazon.jdbc.Driver
+#     - name: SPRING_DATASOURCE_URL
+#       value: jdbc:aws-wrapper:postgresql://ksoptusalb-postgresql.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/ks3?wrapperPlugins=iam
+# # &ssl=true&sslrootcert=/home/runner/.postgresql/ap-southeast-2-bundle.pem    
+#     - name: SPRING_DATASOURCE_USERNAME
+#       value: kaviya
+    # - name: LOGGING_LEVEL_IO_GRPC
+    #   value: DEBUG
+    # - name: LOGGING_LEVEL_IO_CAMUNDA_MODELER
+    #   value: DEBUG
+    # - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB
+    #   value: DEBUG
+    # - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
+
+postgresql:
+  enabled: true
+
+prometheusServiceMonitor:
+  enabled: false
+  labels:
+    release: prometheus
+
+# webModeler:
+#   contextPath: /web-modeler
+#   enabled: true
+#   image:
+#     pullSecrets:
+#       - name: registry-camunda-cloud  
+#   restapi:
+#     mail:
+#       fromAddress: kaviya.sridhar@camunda.com
+    # externalDatabase:
+    #   enabled: true
+    #   url: "jdbc:aws-wrapper:postgresql://ksoptusalb-postgresql.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/ks3?wrapperPlugins=iam"
+    #   user: "kaviya"
+    # env:
+    # - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+    #   value: software.amazon.jdbc.Driver
+#     - name: SPRING_DATASOURCE_URL
+#       value: jdbc:aws-wrapper:postgresql://ksoptusalb-postgresql.cluster-cbuivcnrhul3.ap-southeast-2.rds.amazonaws.com:5432/ks3?wrapperPlugins=iam
+# # &ssl=true&sslrootcert=/home/runner/.postgresql/ap-southeast-2-bundle.pem    
+#     - name: SPRING_DATASOURCE_USERNAME
+#       value: 
