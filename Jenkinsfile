@@ -3,6 +3,7 @@ pipeline {
 
   environment {
     CAMUNDA_VERSION = "12.0.2"
+    CUSTOM_PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
   }
 
   stages {
