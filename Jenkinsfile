@@ -10,6 +10,7 @@ pipeline {
     stage('Add Helm Repo') {
       steps {
         sh '''
+          export PATH=$CUSTOM_PATH:$PATH
           helm repo add camunda https://helm.camunda.io || true
           helm repo update
         '''
@@ -19,6 +20,7 @@ pipeline {
     stage('Install Camunda 8') {
       steps {
         sh '''
+          export PATH=$CUSTOM_PATH:$PATH
           helm install camunda camunda/camunda-platform \
             --version $CAMUNDA_VERSION \
             --namespace camunda \
@@ -30,13 +32,17 @@ pipeline {
 
     stage('Verify') {
       steps {
-        sh 'kubectl get pods -n camunda'
+        sh '''
+          export PATH=$CUSTOM_PATH:$PATH
+          kubectl get pods -n camunda
+        '''
       }
     }
 
     stage('Port Forward Operate (Optional)') {
       steps {
         sh '''
+          export PATH=$CUSTOM_PATH:$PATH
           kubectl port-forward svc/camunda-operate 8080:80 -n camunda &
           sleep 30
           curl http://localhost:8080 || true
